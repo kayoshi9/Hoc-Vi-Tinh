@@ -43,6 +43,7 @@ const LESSONS_DATABASE = [
         session3: `
             <h4>3. Thế giới các loại máy tính quanh em</h4>
             <p>Máy tính không chỉ có hình dáng chiếc thùng sắt đặt trên bàn học:</p>
+            <img src="https://i.postimg.cc/k4GMdCG7/maytinh.png" alt="Minh họa các loại máy tính quanh em: Desktop, Laptop, Tablet và Smartphone" class="lesson-image">
             <ul>
                 <li><strong>Desktop (Máy tính bàn):</strong> Thân máy to, màn hình rộng, bàn phím và chuột tách rời. Rất mạnh mẽ và bền bỉ.</li>
                 <li><strong>Laptop (Máy tính xách tay):</strong> Gom màn hình, pin và bàn phím vào một khối nhỏ gọn, dễ dàng gập lại mang đi học.</li>
