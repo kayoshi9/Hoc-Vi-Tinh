@@ -79,6 +79,7 @@ const LESSONS_DATABASE = [
         session1: `
             <h4>1. Thân xác và Trí tuệ của máy tính</h4>
             <p>Hãy liên tưởng chiếc máy tính giống như một con người:</p>
+            <img src="https://i.postimg.cc/jj6wXBnc/tritue-maytinh.png" alt="Minh họa Bài 2 Buổi 1: Phần cứng là thân xác - Phần mềm là trí tuệ máy tính" class="lesson-image">
             <ul>
                 <li><strong>Phần cứng (Hardware):</strong> Là những bộ phận cơ thể bé có thể nhìn thấy, sờ chạm và cầm nắm được (Vỏ máy, màn hình, bàn phím, chuột, bo mạch chủ, quạt tản nhiệt).</li>
                 <li><strong>Phần mềm (Software):</strong> Là suy nghĩ, ký ức và kiến thức vô hình bên trong não bộ (Hệ điều hành Windows 10, trình duyệt Edge, game Minecraft, bài hát MP3).</li>
@@ -108,6 +109,7 @@ const LESSONS_DATABASE = [
         `,
         session3: `
             <h4>3. Khi một trò chơi khởi động, chuyện gì xảy ra?</h4>
+            <img src="https://i.postimg.cc/7Pjzq14N/hoatdong.png" alt="Minh họa Bài 2 Buổi 3: Cách phần cứng và phần mềm phối hợp khi mở trò chơi" class="lesson-image">
             <ol>
                 <li>Bé bấm đúp chuột vào biểu tượng trò chơi (Phần cứng chuột báo tín hiệu).</li>
                 <li>Hệ điều hành Windows 10 (Phần mềm hệ thống) tiếp nhận lệnh và ra lệnh cho Ổ cứng SSD (Phần cứng) nạp tệp dữ liệu lên RAM.</li>
