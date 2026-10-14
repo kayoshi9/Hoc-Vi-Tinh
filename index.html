@@ -414,6 +414,12 @@
         </div>
     </div>
 
+    <!-- ÂM THANH GIAO DIỆN (preload để phát tức thì khi click) -->
+    <audio id="audio-theory" src="audio/theory.mp3" preload="auto"></audio>
+    <audio id="audio-practice" src="audio/practice.mp3" preload="auto"></audio>
+    <audio id="audio-quiz" src="audio/quiz.mp3" preload="auto"></audio>
+    <audio id="audio-congrates" src="audio/congrates.mp3" preload="auto"></audio>
+
     <!-- NẠP TỆP DỮ LIỆU BÀI HỌC -->
     <script src="lessons_data.js"></script>
 
@@ -425,6 +431,39 @@
         const ADMIN_PASSWORD = "0786001768";
         const QUIZ_PASS_SCORE = 8;
         let isAdminMode = false;
+
+        /* ===== AUDIO ENGINE: tab clicks + celebrate ===== */
+        const TAB_AUDIO_IDS = {
+            theory: "audio-theory",
+            practice: "audio-practice",
+            quiz: "audio-quiz"
+        };
+        function playAudioById(id, volume = 1) {
+            try {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.volume = volume;
+                el.pause();
+                el.currentTime = 0;
+                const p = el.play();
+                if (p && typeof p.catch === "function") p.catch(() => {});
+            } catch (e) {}
+        }
+        function stopTabSounds() {
+            Object.values(TAB_AUDIO_IDS).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { try { el.pause(); el.currentTime = 0; } catch (e) {} }
+            });
+        }
+        function playTabSound(tabKey) {
+            const id = TAB_AUDIO_IDS[tabKey];
+            if (!id) return; // tab 'code' không có âm thanh riêng
+            stopTabSounds();
+            playAudioById(id, 1);
+        }
+        function playCongratesSound() {
+            playAudioById("audio-congrates", 1);
+        }
 
         function badgeImg(id) {
             const num = String(id).padStart(3, "0");
@@ -451,6 +490,11 @@
         }
 
         function switchTab(tabKey, btnElement) {
+            // Phát âm thanh khi user click trực tiếp vào tab theory / practice / quiz.
+            // Trường hợp gọi lập trình (btnElement undefined, vd loadLesson tự về theory) thì không phát để tránh ồn.
+            if (btnElement && TAB_AUDIO_IDS[tabKey]) {
+                playTabSound(tabKey);
+            }
             document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
             document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
 
@@ -773,6 +817,8 @@
             document.getElementById("celebrate-badge-name").innerText = "🏅 " + lesson.badge;
             document.getElementById("celebrate-lesson-title").innerText = `Bài ${lesson.id < 10 ? "0" + lesson.id : lesson.id}. ${lesson.title}`;
             document.getElementById("celebrate-modal").classList.add("show");
+            // Phát âm thanh chúc mừng ngay khi modal hiện
+            playCongratesSound();
         }
 
         function closeCelebrateModal() {
