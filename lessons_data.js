@@ -716,6 +716,64 @@ const FULL_SYLLABUS = [
     ]}
 ];
 
+// Bảng huy hiệu chính thức cho 54 bài auto (đồng phong cách với 9 huy hiệu custom)
+const LESSON_BADGES = {
+    4: "Ninja Chuột Phím",
+    5: "Thị Trưởng Windows",
+    6: "Bậc Thầy Khởi Động",
+    7: "Ảo Thuật Gia Cửa Sổ",
+    8: "Nhà Sưu Tầm Tệp Tin",
+    9: "Hiệp Sĩ An Toàn Mạng",
+    10: "Bậc Thầy Bản Đồ Máy Tính",
+    12: "Bậc Thầy Đa Nhiệm",
+    13: "Phù Thủy Phím Tắt",
+    15: "Kiến Trúc Sư Thư Mục",
+    16: "Chúa Tể Copy-Paste",
+    17: "Thám Tử Tìm Kiếm",
+    18: "Bậc Thầy Ứng Dụng",
+    19: "Tổng Chỉ Huy Cài Đặt",
+    20: "Nhà Thiết Kế Không Gian Số",
+    21: "Nhà Tạo Mốt Windows",
+    22: "Bậc Thầy Màn Hình",
+    23: "DJ Âm Thanh Nhí",
+    24: "Thợ Săn Ứng Dụng An Toàn",
+    25: "Tay Đua Khởi Động",
+    26: "Chiến Binh Dọn Dẹp",
+    27: "Hiệp Sĩ Bảo Vệ Windows",
+    28: "Bác Sĩ Hiệu Năng",
+    29: "Thợ Săn Lỗi",
+    30: "Bác Sĩ Chăm Sóc Máy Tính",
+    31: "Thuyền Trưởng Lướt Web",
+    32: "Nhà Thám Hiểm Google",
+    33: "Chuyên Gia Tải Xuống An Toàn",
+    34: "Nhà Phân Loại Phần Mềm",
+    35: "Game Thủ Thông Thái",
+    36: "Nhà Thám Hiểm GitHub",
+    37: "Đại Sứ Mã Nguồn Mở",
+    38: "Hiệp Sĩ Bản Quyền",
+    39: "Vệ Binh Mật Khẩu",
+    40: "Nhà Sưu Tầm Phần Mềm",
+    42: "Người Dựng Trại Code",
+    44: "Bậc Thầy Biểu Mẫu",
+    45: "Phù Thủy Sắc Màu CSS",
+    46: "Kiến Trúc Sư Bố Cục",
+    47: "Phù Thủy Biến Số",
+    48: "Nhà Tiên Tri If-Else",
+    49: "Bậc Thầy Vòng Lặp",
+    50: "Phù Thủy Sự Kiện",
+    51: "Nhà Sáng Tạo Website",
+    54: "Phù Thủy Prompt",
+    55: "Thám Tử Mã Nguồn AI",
+    56: "Thợ Săn Bug",
+    57: "Thủ Kho Điểm Số",
+    58: "Kiến Trúc Sư Game 2D",
+    59: "Nhà Chế Tạo Game",
+    60: "Phù Thủy Hiệu Ứng",
+    61: "Nhà Phát Minh Tiện Ích",
+    62: "Tổng Kiểm Định Chất Lượng",
+    63: "Huyền Thoại Coder Nhí"
+};
+
 // Hàm lấy dữ liệu đầy đủ của 63 bài học
 function getFullLessons() {
     let result = [];
@@ -731,7 +789,7 @@ function getFullLessons() {
                     chapterId: chap.chap,
                     chapterTitle: chap.name,
                     title: l.title,
-                    badge: `Chuyên Gia Bài ${l.id}`,
+                    badge: LESSON_BADGES[l.id] || `Chuyên Gia Bài ${l.id}`,
                     desc: `Nắm vững lý thuyết cốt lõi, thực hành từng bước trên môi trường Windows 10 và làm chủ bài học: ${l.title}.`,
                     session1: `
                         <h4>1. Khám phá kiến thức cốt lõi: ${l.title}</h4>
