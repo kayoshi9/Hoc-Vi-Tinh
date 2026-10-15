@@ -143,6 +143,7 @@ const LESSONS_DATABASE = [
         desc: "Thấu hiểu nguyên lý làm việc của Bộ ba nguyên tử: Não bộ CPU, Bàn học RAM và Tủ kho tài liệu SSD/HDD trên Windows 10.",
         session1: `
             <h4>1. Câu chuyện căn phòng làm việc của Giáo sư Máy Tính</h4>
+            <img src="https://i.postimg.cc/28zJS3Zm/giaosumaytinh.png" alt="Minh họa Bài 3 Buổi 1: Giáo sư Máy Tính - CPU, RAM và Ổ cứng" class="lesson-image">
             <div class="model-box">
                 <div class="model-step">
                     <strong>🧠 Não bộ CPU</strong><br>
