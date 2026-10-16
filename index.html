@@ -447,10 +447,12 @@
             if (!frame) return;
             const entry = SIM_REGISTRY[lessonId];
             if (entry) {
-                if (frame.getAttribute("src") !== entry.src) frame.setAttribute("src", entry.src);
+                // QUAN TRỌNG: srcdoc lấn át src — phải gỡ hẳn mới hiện được sim-taskmanager.html
+                frame.removeAttribute("srcdoc");
+                frame.setAttribute("src", entry.src);
                 if (cap) cap.innerText = "🔬 " + entry.caption;
             } else {
-                frame.removeAttribute("src");
+                try { frame.removeAttribute("src"); } catch(e){}
                 frame.srcdoc = "<div style=\"font-family:'Segoe UI',sans-serif;padding:40px;text-align:center;color:#605E5C\"><div style=\"font-size:3rem\">🔬</div><h3>Kịch bản giả lập cho bài này đang được xây dựng</h3><p>Mỗi bài sẽ có 1 kịch bản minh họa khác nhau.<br>Hiện đã có: <b>Bài 03 — Task Manager (CPU/RAM/SSD)</b>.</p></div>";
                 if (cap) cap.innerText = "🔬 Bài này chưa có kịch bản giả lập riêng — hãy xem Bài 03 để thử mẫu Task Manager.";
             }
