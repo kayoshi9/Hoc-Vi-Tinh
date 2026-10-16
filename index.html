@@ -301,6 +301,7 @@
                 <button class="tab-btn" data-tab="practice" onclick="switchTab('practice', this)">🛠️ 3 Thử Thách Thực Hành</button>
                 <button class="tab-btn" data-tab="quiz" onclick="switchTab('quiz', this)">🎯 Bài Kiểm Tra (10 Câu)</button>
                 <button class="tab-btn" id="code-tab-btn" data-tab="code" onclick="switchTab('code', this)" style="display:none;">💻 Sân Chơi Code</button>
+                <button class="tab-btn" data-tab="sim" onclick="switchTab('sim', this)">🔬 Giả Lập</button>
             </nav>
 
             <!-- TAB 1: LÝ THUYẾT -->
@@ -367,6 +368,14 @@
                 </div>
             </section>
 
+            <!-- TAB 5: GIẢ LẬP (mỗi bài 1 kịch bản khác nhau) -->
+            <section id="tab-sim" class="tab-content">
+                <div id="sim-container" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+                    <iframe id="sim-iframe" title="Giả lập minh họa bài học" style="width:100%;height:720px;border:none;background:#EAEAEA;"></iframe>
+                </div>
+                <p id="sim-caption" style="margin-top:10px;font-size:0.85rem;color:var(--text-muted);"></p>
+            </section>
+
             <div class="lesson-nav-footer">
                 <button class="btn" style="background:#8A8886;" id="prev-btn" onclick="prevLesson()">⬅️ Bài Trước</button>
                 <button class="btn" id="next-btn" onclick="nextLesson()">Bài Kế Tiếp ➡️</button>
@@ -427,6 +436,25 @@
         let ALL_LESSONS = [];
         let currentLessonIndex = 0;
         let currentQuizAnswers = {};
+
+        /* ===== SIM REGISTRY: mỗi bài 1 kịch bản giả lập riêng ===== */
+        const SIM_REGISTRY = {
+            3: { src: "sim-taskmanager.html", caption: "Kịch bản Bài 03: Quan sát nhịp tim CPU & RAM qua Task Manager (Ctrl + Shift + Esc → Performance)." }
+        };
+        function loadSim(lessonId) {
+            const frame = document.getElementById("sim-iframe");
+            const cap = document.getElementById("sim-caption");
+            if (!frame) return;
+            const entry = SIM_REGISTRY[lessonId];
+            if (entry) {
+                if (frame.getAttribute("src") !== entry.src) frame.setAttribute("src", entry.src);
+                if (cap) cap.innerText = "🔬 " + entry.caption;
+            } else {
+                frame.removeAttribute("src");
+                frame.srcdoc = "<div style=\"font-family:'Segoe UI',sans-serif;padding:40px;text-align:center;color:#605E5C\"><div style=\"font-size:3rem\">🔬</div><h3>Kịch bản giả lập cho bài này đang được xây dựng</h3><p>Mỗi bài sẽ có 1 kịch bản minh họa khác nhau.<br>Hiện đã có: <b>Bài 03 — Task Manager (CPU/RAM/SSD)</b>.</p></div>";
+                if (cap) cap.innerText = "🔬 Bài này chưa có kịch bản giả lập riêng — hãy xem Bài 03 để thử mẫu Task Manager.";
+            }
+        }
 
         const ADMIN_PASSWORD = "0786001768";
         const QUIZ_PASS_SCORE = 8;
@@ -604,6 +632,9 @@
 
             // Quiz
             renderQuiz(lesson);
+
+            // Sim (tab Giả Lập riêng cho từng bài)
+            loadSim(lesson.id);
 
             // Code Playground
             const codeTabBtn = document.getElementById("code-tab-btn");

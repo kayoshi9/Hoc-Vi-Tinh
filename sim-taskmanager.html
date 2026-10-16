@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giả lập Task Manager Win10 — Bài 3 Buổi 2</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Roboto,sans-serif}
+  :root{--win-blue:#0078D7;--win-dark:#005A9E;--ok:#107C41;--warn:#B45309;--bg:#EAEAEA;--card:#fff;--muted:#605E5C}
+  body{background:var(--bg);color:#201F1E;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
+  .wrap{width:100%;max-width:980px}
+  .topbar{background:#fff;border:1px solid #D2D0CE;border-radius:10px;padding:12px 16px;margin-bottom:12px}
+  .topbar h1{font-size:1.05rem;color:var(--win-dark)}
+  .topbar p{font-size:.88rem;color:var(--muted);margin-top:4px;line-height:1.5}
+  .steps{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+  .step-pill{flex:1;min-width:140px;background:#F3F2F1;border:2px solid transparent;border-radius:8px;padding:8px 10px;font-size:.82rem;font-weight:600}
+  .step-pill.active{border-color:var(--win-blue);background:#EFF6FC}
+  .step-pill.done{border-color:var(--ok);background:#DFF6DD}
+  #sim-hint{background:#FFF4CE;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;font-size:.92rem;min-height:48px;line-height:1.5}
+  #sim-hint strong{color:#795548}
+  /* virtual keyboard */
+  .kbd-stage{background:#1E1E1E;color:#fff;border-radius:10px;padding:18px;margin:12px 0;text-align:center}
+  .kbd-row{display:flex;gap:12px;justify-content:center;margin:14px 0;flex-wrap:wrap}
+  .vkey{min-width:110px;padding:14px 16px;border-radius:8px;border:2px solid #605E5C;background:#323130;color:#fff;font-weight:700;font-size:.95rem;cursor:pointer}
+  .vkey:focus-visible,.tablink:focus-visible,.perf-item:focus-visible,.ctl-btn:focus-visible{outline:3px solid #FFB900;outline-offset:2px}
+  .vkey.pressed{background:var(--ok);border-color:#fff;transform:translateY(2px)}
+  .vkey.hint-glow{animation:glow 1.2s infinite}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(255,185,0,.7)}50%{box-shadow:0 0 0 8px rgba(255,185,0,0)}}
+  /* Task Manager window */
+  #tm-window{background:#fff;border:1px solid #8A8886;border-radius:8px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.25);margin:12px 0;display:none}
+  #tm-window.show{display:block}
+  .tm-titlebar{background:#F3F2F1;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:.85rem;font-weight:600;border-bottom:1px solid #E1DFDD}
+  .tm-tabs{display:flex;gap:2px;padding:8px 10px 0 10px;border-bottom:1px solid #E1DFDD;flex-wrap:wrap}
+  .tablink{border:none;background:transparent;padding:8px 14px;font-size:.86rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}
+  .tablink.active{color:#201F1E;border-bottom-color:var(--win-blue)}
+  .tablink.need-attention{background:#FFF4CE;border-radius:6px 6px 0 0;animation:glow 1.2s infinite}
+  .tm-body{display:flex;min-height:380px}
+  .perf-list{width:230px;border-right:1px solid #EDEBE9;background:#FAF9F8;padding:8px}
+  .perf-item{width:100%;text-align:left;border:none;background:transparent;padding:10px;border-radius:6px;cursor:pointer;margin-bottom:4px}
+  .perf-item:hover{background:#F3F2F1}
+  .perf-item.selected{background:#EFF6FC;outline:2px solid var(--win-blue)}
+  .perf-item .t{font-weight:700;font-size:.88rem}
+  .perf-item .s{font-size:.76rem;color:var(--muted)}
+  .perf-detail{flex:1;padding:14px}
+  .perf-detail h2{font-size:1rem;margin-bottom:2px}
+  .perf-detail .sub{font-size:.8rem;color:var(--muted);margin-bottom:8px}
+  #graph{width:100%;height:180px;border:1px solid #C8C6C4;border-radius:6px;background:#fff}
+  .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;font-size:.82rem}
+  .spec-grid div{background:#F8F9FA;border:1px solid #EDEBE9;border-radius:6px;padding:6px 8px}
+  .prof-box{background:#EFF6FC;border-left:4px solid var(--win-blue);border-radius:0 8px 8px 0;padding:10px 12px;margin-top:10px;font-size:.88rem;line-height:1.55}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .ctl-btn{border:1px solid #8A8886;background:#fff;border-radius:6px;padding:9px 14px;font-weight:700;font-size:.86rem;cursor:pointer}
+  .ctl-btn.primary{background:var(--win-blue);color:#fff;border-color:var(--win-dark)}
+  .ctl-btn.primary:hover{background:var(--win-dark)}
+  .badge-ok{display:inline-block;background:#DFF6DD;border:1px solid var(--ok);color:#0b5a2f;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:800;margin-left:6px}
+  .shake{animation:shake .25s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .footer-note{font-size:.8rem;color:var(--muted);line-height:1.5;margin-top:8px}
+  @media(max-width:700px){.tm-body{flex-direction:column}.perf-list{width:100%;display:flex;gap:6px}.perf-item{flex:1}.spec-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap" role="main" aria-label="Giả lập Task Manager Windows 10">
+  <div class="topbar">
+    <h1>🔬 Tab Giả lập — Bài 3 Buổi 2: Nhịp tim CPU &amp; RAM qua Task Manager</h1>
+    <p>Mô phỏng <strong>giống Windows 10 thật 95%</strong> để bé nhận ra ngay trên máy thật. Bé sẽ <strong>xem là chính</strong>, chỉ cần bấm đúng 3 điểm dừng là qua bài.</p>
+    <div class="steps" aria-hidden="false">
+      <div class="step-pill" id="pill1">① Bấm 3 phím thần thánh</div>
+      <div class="step-pill" id="pill2">② Mở tab Performance</div>
+      <div class="step-pill" id="pill3">③ Soi CPU / Memory / Disk</div>
+    </div>
+  </div>
+
+  <div id="sim-hint" role="status" aria-live="polite">👋 <strong>Giáo sư Máy Tính:</strong> Bấm nút <strong>▶ Bắt đầu minh họa</strong> để mở Task Manager như hacker thật nhé!</div>
+
+  <div class="controls">
+    <button class="ctl-btn primary" id="btn-start">▶ Bắt đầu minh họa</button>
+    <button class="ctl-btn" id="btn-pause" disabled>⏸ Tạm dừng đồ thị</button>
+    <button class="ctl-btn" id="btn-replay">↺ Chơi lại từ đầu</button>
+    <button class="ctl-btn" id="btn-bigtext" aria-pressed="false">🔎 Chữ to</button>
+  </div>
+
+  <!-- STAGE 1: virtual keyboard -->
+  <div class="kbd-stage" id="kbd-stage">
+    <div style="font-size:.9rem;opacity:.9">BÀN PHÍM GIẢ LẬP — giữ cả 3 phím cùng lúc (có thể bấm phím thật trên máy!)</div>
+    <div class="kbd-row">
+      <button class="vkey" data-key="Control" aria-label="Phím Control">Ctrl</button>
+      <button class="vkey" data-key="Shift" aria-label="Phím Shift">Shift</button>
+      <button class="vkey" data-key="Escape" aria-label="Phím Escape">Esc</button>
+    </div>
+    <div style="font-size:.82rem;color:#D2D0CE">💡 Mẹo: bấm từng phím giả bằng chuột / ngón tay, hoặc giữ <code>Ctrl + Shift + Esc</code> thật. Đã bấm: <span id="keys-count">0/3</span></div>
+  </div>
+
+  <!-- STAGE 2+3: Task Manager -->
+  <div id="tm-window" aria-label="Cửa sổ Task Manager giả lập">
+    <div class="tm-titlebar"><span>🖥️ Task Manager</span><span aria-hidden="true">— ▢ ✕</span></div>
+    <div class="tm-tabs" role="tablist" aria-label="Các thẻ Task Manager">
+      <button class="tablink" data-tab="Processes" role="tab">Processes</button>
+      <button class="tablink" id="tab-performance" data-tab="Performance" role="tab">Performance</button>
+      <button class="tablink" data-tab="App history" role="tab">App history</button>
+      <button class="tablink" data-tab="Startup" role="tab">Start-up</button>
+      <button class="tablink" data-tab="Users" role="tab">Users</button>
+      <button class="tablink" data-tab="Details" role="tab">Details</button>
+      <button class="tablink" data-tab="Services" role="tab">Services</button>
+    </div>
+    <div class="tm-body">
+      <div class="perf-list" role="listbox" aria-label="Danh sách phần cứng">
+        <button class="perf-item selected" data-perf="cpu" role="option" aria-selected="true">
+          <div class="t">⚡ CPU <span class="badge-ok" id="ok-cpu" style="display:none">✓ đã soi</span></div>
+          <div class="s" id="left-cpu-sub">25% 2.90 GHz</div>
+        </button>
+        <button class="perf-item" data-perf="memory" role="option" aria-selected="false">
+          <div class="t">🧠 Memory <span class="badge-ok" id="ok-mem" style="display:none">✓ đã soi</span></div>
+          <div class="s" id="left-mem-sub">3.2/7.9 GB (41%)</div>
+        </button>
+        <button class="perf-item" data-perf="disk" role="option" aria-selected="false">
+          <div class="t">💾 Disk 0 (SSD) <span class="badge-ok" id="ok-disk" style="display:none">✓ đã soi</span></div>
+          <div class="s" id="left-disk-sub">2% 15 MB/s</div>
+        </button>
+      </div>
+      <div class="perf-detail">
+        <h2 id="detail-title">CPU — Sóng não của Giáo sư</h2>
+        <div class="sub" id="detail-sub">Intel Core i5-10400 @ 2.90GHz • Đồ thị 60 giây gần nhất</div>
+        <canvas id="graph" width="640" height="180" aria-label="Đồ thị sử dụng phần cứng theo thời gian"></canvas>
+        <div class="spec-grid" id="spec-grid"></div>
+        <div class="prof-box" id="prof-box">🧑‍🏫 <strong>Giáo sư:</strong> Đường xanh nhấp nhô là nhịp tim CPU. Vọt lên 100% nghĩa là thầy đang gánh bài quá nặng!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    ♿ Tiếp cận: dùng được bằng chuột, cảm ứng và chỉ bàn phím (Tab + Enter). Không phụ thuộc màu sắc (luôn có chữ + ✓/⚠️). Đồ thị chạy mượt, không nháy gắt. Chữ to dùng được ở mọi độ phân giải.<br>
+    🧩 Khung này dùng lại cho 63 bài: mỗi bài chỉ cần đổi kịch bản trong <code>SIM_REGISTRY</code> (ví dụ Bài 14: File Explorer, Bài 41: F12 DevTools).
+  </div>
+</div>
+
+<script>
+(function(){
+  const hint = document.getElementById('sim-hint');
+  const pills = [document.getElementById('pill1'),document.getElementById('pill2'),document.getElementById('pill3')];
+  const kbdStage = document.getElementById('kbd-stage');
+  const tmWin = document.getElementById('tm-window');
+  const btnStart = document.getElementById('btn-start');
+  const btnPause = document.getElementById('btn-pause');
+  const btnReplay = document.getElementById('btn-replay');
+  const btnBig = document.getElementById('btn-bigtext');
+  const keysCount = document.getElementById('keys-count');
+  const vkeys = Array.from(document.querySelectorAll('.vkey'));
+  let step = 0, paused = false, currentPerf = 'cpu';
+  let pressed = new Set(), visited = new Set(['cpu']);
+
+  const PROF = {
+    cpu:'🧑‍🏫 <strong>Giáo sư (CPU):</strong> Đường xanh nhấp nhô là nhịp tim của thầy. Lúc yên 12–35%, lúc mở game có thể vọt 100%!',
+    memory:'🪑 <strong>Bàn học (RAM):</strong> Máy đang bày 3.2 trên 7.9 GB sách ra bàn (41%). Tắt máy là bàn bị dọn sạch!',
+    disk:'🗄️ <strong>Tủ kho (SSD):</strong> Tốc độ đọc/ghi của tủ sách. Dù cúp điện, sách trong tủ vẫn còn nguyên!'
+  };
+  const SPECS = {
+    cpu:[['Utilization','<b id="v-cpu">25%</b>'],['Speed','2.90 GHz'],['Processes','132'],['Up time','00:42:15']],
+    memory:[['In use','<b>3.2 GB</b>'],['Available','4.7 GB'],['Total','7.9 GB'],['Usage','<b>41%</b>']],
+    disk:[['Active time','<b id="v-disk">2%</b>'],['Read speed','12 MB/s'],['Write speed','3 MB/s'],['Capacity','256 GB SSD']]
+  };
+  const TITLES = {cpu:'CPU — Sóng não của Giáo sư',memory:'Memory — Mặt bàn học RAM',disk:'Disk 0 (SSD) — Tủ sách vĩnh viễn'};
+
+  function setPill(i,state){pills[i].classList.remove('active','done');if(state)pills[i].classList.add(state);}
+  function say(html){hint.innerHTML=html;}
+  function renderSpecs(){
+    document.getElementById('spec-grid').innerHTML = SPECS[currentPerf].map(s=>'<div><div style="color:#605E5C">'+s[0]+'</div><div>'+s[1]+'</div></div>').join('');
+    document.getElementById('detail-title').textContent = TITLES[currentPerf];
+    document.getElementById('prof-box').innerHTML = PROF[currentPerf];
+    document.querySelectorAll('.perf-item').forEach(b=>{
+      const on = b.dataset.perf===currentPerf;
+      b.classList.toggle('selected',on);b.setAttribute('aria-selected',on);
+    });
+  }
+
+  // --- Step 1: keys ---
+  function updateKeys(){
+    keysCount.textContent = pressed.size+'/3';
+    vkeys.forEach(k=>k.classList.toggle('pressed',pressed.has(k.dataset.key)));
+    if(pressed.size===3 && step===1){
+      setPill(0,'done');
+      say('✅ <strong>Tuyệt vời!</strong> Bé đã giữ đủ 3 phím <strong>Ctrl + Shift + Esc</strong>. Task Manager đang bật lên...');
+      setTimeout(openTM,700);
+    }
+  }
+  vkeys.forEach(k=>k.addEventListener('click',()=>{if(step!==1)return;pressed.add(k.dataset.key);updateKeys();}));
+  document.addEventListener('keydown',e=>{
+    if(step!==1)return;
+    let k=null;
+    if(e.key==='Control')k='Control';else if(e.key==='Shift')k='Shift';else if(e.key==='Escape')k='Escape';
+    if(k){pressed.add(k);updateKeys();}
+  });
+
+  btnStart.addEventListener('click',()=>{
+    step=1;pressed.clear();updateKeys();
+    setPill(0,'active');setPill(1,'');setPill(2,'');
+    vkeys.forEach(k=>k.classList.add('hint-glow'));
+    say('⌨️ <strong>Điểm dừng 1/3:</strong> Hãy bấm lần lượt 3 phím sáng đèn <strong>Ctrl → Shift → Esc</strong> (bấm phím giả hoặc phím thật đều được).');
+    btnStart.disabled=true;btnPause.disabled=true;
+    kbdStage.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+  btnReplay.addEventListener('click',()=>{
+    step=0;pressed.clear();visited=new Set(['cpu']);currentPerf='cpu';paused=false;
+    document.getElementById('ok-mem').style.display='none';
+    document.getElementById('ok-disk').style.display='none';
+    document.getElementById('ok-cpu').style.display='none';
+    tmWin.classList.remove('show');btnStart.disabled=false;btnPause.disabled=true;btnPause.textContent='⏸ Tạm dừng đồ thị';
+    pills.forEach(p=>p.classList.remove('active','done'));
+    vkeys.forEach(k=>{k.classList.remove('pressed','hint-glow');});
+    keysCount.textContent='0/3';renderSpecs();
+    say('👋 <strong>Giáo sư Máy Tính:</strong> Bấm nút <strong>▶ Bắt đầu minh họa</strong> để mở Task Manager như hacker thật nhé!');
+  });
+  btnPause.addEventListener('click',()=>{
+    paused=!paused;btnPause.textContent=paused?'▶ Tiếp tục đồ thị':'⏸ Tạm dừng đồ thị';
+    say(paused?'⏸ Đồ thị đã dừng — bé quan sát đỉnh sóng nhé! Bấm Tiếp tục để chạy tiếp.':'▶ Đồ thị đang chạy lại — nhịp tim máy tính đập liên tục!');
+  });
+  btnBig.addEventListener('click',()=>{
+    const on = btnBig.getAttribute('aria-pressed')==='true';
+    btnBig.setAttribute('aria-pressed',String(!on));
+    document.body.style.fontSize = on?'':'18px';
+  });
+
+  // --- Step 2: tabs ---
+  function openTM(){
+    tmWin.classList.add('show');btnPause.disabled=false;
+    vkeys.forEach(k=>k.classList.remove('hint-glow'));
+    step=2;setPill(1,'active');
+    document.getElementById('tab-performance').classList.add('need-attention');
+    say('🪟 <strong>Điểm dừng 2/3:</strong> Task Manager đã mở! Hãy bấm vào thẻ <strong>Performance</strong> nhấp nháy ở trên cùng để xem nhịp tim máy.');
+    tmWin.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  document.querySelectorAll('.tablink').forEach(t=>t.addEventListener('click',()=>{
+    if(step!==2)return;
+    if(t.dataset.tab==='Performance'){
+      t.classList.add('active');t.classList.remove('need-attention');step=3;setPill(1,'done');setPill(2,'active');
+      say('📈 <strong>Đúng rồi!</strong> Đây là phòng theo dõi nhịp tim. <strong>Điểm dừng 3/3:</strong> bấm lần lượt <strong>Memory</strong> rồi <strong>Disk 0</strong> ở cột trái để soi hết nhé! (CPU đã soi ✓)');
+      document.getElementById('ok-cpu').style.display='inline-block';
+    }else{
+      tmWin.classList.remove('shake');void tmWin.offsetWidth;tmWin.classList.add('shake');
+      say('⚠️ <strong>Chưa đúng chỗ!</strong> Thẻ <em>'+t.dataset.tab+'</em> không có đồ thị nhịp tim. Hãy tìm chữ <strong>Performance</strong> sáng đèn ở trên cùng nhé!');
+    }
+  }));
+
+  // --- Step 3: perf items ---
+  document.querySelectorAll('.perf-item').forEach(b=>b.addEventListener('click',()=>{
+    if(step<3)return;
+    currentPerf=b.dataset.perf;visited.add(currentPerf);renderSpecs();
+    if(currentPerf==='memory')document.getElementById('ok-mem').style.display='inline-block';
+    if(currentPerf==='disk')document.getElementById('ok-disk').style.display='inline-block';
+    if(visited.has('memory')&&visited.has('disk')&&step===3){
+      step=4;setPill(2,'done');
+      say('🎉 <strong>Bé đã soi xong nhịp tim máy tính!</strong> Giờ bé tự do ngắm đồ thị chạy. Nhớ: RAM đầy + CPU 100% là máy sẽ lag — hãy đóng bớt tab nhé! Hãy qua làm Tasks thật trên máy!');
+    }
+  }));
+
+  // --- Live graphs ---
+  const cv=document.getElementById('graph'),ctx=cv.getContext('2d');
+  const N=60;let cpuH=Array(N).fill(25),memH=Array(N).fill(41),diskH=Array(N).fill(4);
+  function push(arr,v){arr.push(v);arr.shift();}
+  setInterval(()=>{
+    if(paused||!tmWin.classList.contains('show'))return;
+    const cpu = Math.max(8,Math.min(96,cpuH[cpuH.length-1]+(Math.random()*14-7)+(Math.random()<0.06?35:0)));
+    const mem = Math.max(35,Math.min(55,memH[memH.length-1]+(Math.random()*2-1)));
+    const disk = Math.max(1,Math.min(60,diskH[diskH.length-1]+(Math.random()*8-4)+(Math.random()<0.08?20:0)));
+    push(cpuH,cpu);push(memH,mem);push(diskH,disk);
+    document.getElementById('left-cpu-sub').textContent=Math.round(cpu)+'% 2.90 GHz';
+    const v=document.getElementById('v-cpu');if(v)v.textContent=Math.round(cpu)+'%';
+    document.getElementById('left-mem-sub').textContent=(mem*7.9/100).toFixed(1)+'/7.9 GB ('+Math.round(mem)+'%)';
+    document.getElementById('left-disk-sub').textContent=Math.round(disk)+'% '+(10+disk/3).toFixed(0)+' MB/s';
+    const vd=document.getElementById('v-disk');if(vd)vd.textContent=Math.round(disk)+'%';
+    draw();
+  },600);
+  function draw(){
+    const data = currentPerf==='cpu'?cpuH:currentPerf==='memory'?memH:diskH;
+    const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#EDEBE9';ctx.lineWidth=1;
+    for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(0,H*i/4);ctx.lineTo(W,H*i/4);ctx.stroke();}
+    for(let i=1;i<6;i++){ctx.beginPath();ctx.moveTo(W*i/6,0);ctx.lineTo(W*i/6,H);ctx.stroke();}
+    ctx.beginPath();
+    data.forEach((v,i)=>{const x=i/(N-1)*W,y=H-(v/100)* (H-14)-4;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.strokeStyle='#0078D7';ctx.lineWidth=2;ctx.stroke();
+    ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();
+    ctx.fillStyle='rgba(0,120,215,.12)';ctx.fill();
+  }
+  renderSpecs();draw();
+})();
+</script>
+</body>
+</html>
