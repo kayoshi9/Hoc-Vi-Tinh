@@ -780,7 +780,8 @@ function getFullLessons() {
     let result = [];
     FULL_SYLLABUS.forEach(chap => {
         chap.lessons.forEach(l => {
-            const existing = LESSONS_DATABASE.find(item => item.id === l.id);
+            const extra = (typeof EXTRA_LESSONS !== "undefined" && EXTRA_LESSONS[l.id]) ? EXTRA_LESSONS[l.id] : null;
+            const existing = extra || LESSONS_DATABASE.find(item => item.id === l.id);
             if (existing) {
                 result.push(existing);
             } else {

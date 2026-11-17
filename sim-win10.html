@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giả lập Windows 10 — Học vi tính</title>
+<link rel="stylesheet" href="sim-win10.css">
+</head>
+<body>
+<div id="app">
+    <div id="desktop">
+        <div id="desktop-area">
+            <div id="desktop-icons" aria-label="Biểu tượng Desktop"></div>
+            <div id="windows-layer"></div>
+
+            <!-- START MENU -->
+            <div id="start-menu" class="start-menu hidden" role="dialog" aria-label="Start Menu">
+                <div class="start-search-row">
+                    <span class="start-search-icon">🔍</span>
+                    <input id="start-search" type="text" placeholder="Nhập để tìm ứng dụng..." autocomplete="off">
+                </div>
+                <div class="start-label">Ứng dụng</div>
+                <div id="start-apps" class="start-apps"></div>
+                <div class="start-footer">
+                    <button id="start-user" class="start-user" title="Tài khoản">
+                        <span class="avatar">🧑‍💻</span><span>Coder Nhi</span>
+                    </button>
+                    <div class="start-footer-actions">
+                        <button id="start-lock" class="start-icon-btn" title="Khóa máy (Lock)">🔒</button>
+                        <button id="start-power" class="start-icon-btn" title="Nguồn (Power)">⏻</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POWER MENU -->
+            <div id="power-menu" class="power-menu hidden" role="menu">
+                <button data-power="sleep">🌙 Sleep</button>
+                <button data-power="restart">🔄 Restart</button>
+                <button data-power="shutdown">⏻ Shut down</button>
+            </div>
+
+            <!-- CONTEXT MENU -->
+            <div id="ctx-menu" class="ctx-menu hidden" role="menu"></div>
+
+            <!-- TOAST -->
+            <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+            <!-- LOCK / LOGIN -->
+            <div id="lock-screen" class="lock-screen hidden">
+                <div class="lock-time" id="lock-time">09:41</div>
+                <div class="lock-date" id="lock-date">Thứ Hai, 15/01/2025</div>
+                <div class="login-card">
+                    <div class="login-avatar">🧑‍💻</div>
+                    <div class="login-name">Coder Nhi</div>
+                    <div class="login-hint">Nhập PIN mẫu: <strong>1234</strong></div>
+                    <div class="pin-row">
+                        <input id="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="PIN">
+                        <button id="pin-go">→</button>
+                    </div>
+                    <div id="pin-err" class="pin-err"></div>
+                </div>
+            </div>
+
+            <!-- POWER ANIMATION -->
+            <div id="power-screen" class="power-screen hidden">
+                <div id="power-screen-inner"></div>
+            </div>
+
+            <!-- MISSION COMPLETE -->
+            <div id="celebrate" class="celebrate hidden">
+                <div class="celebrate-card">
+                    <div class="celebrate-emoji">🏆</div>
+                    <h2>HOÀN THÀNH XUẤT SẮC!</h2>
+                    <p id="celebrate-text">Bé đã hoàn thành mọi bước của kịch bản.</p>
+                    <div id="confetti"></div>
+                    <div class="celebrate-actions">
+                        <button id="celebrate-close" class="sim-btn primary">Tiếp tục khám phá</button>
+                        <button id="celebrate-reset" class="sim-btn">↺ Làm lại</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASKBAR -->
+            <div id="taskbar" class="taskbar">
+                <button id="taskbar-start" class="taskbar-start" title="Start">⊞</button>
+                <div class="taskbar-search" id="taskbar-search">
+                    <span>🔍</span><input id="taskbar-search-input" type="text" placeholder="Tìm kiếm trên web và Windows" autocomplete="off">
+                </div>
+                <div id="taskbar-apps" class="taskbar-apps"></div>
+                <div class="taskbar-tray">
+                    <span title="Mạng">🌐</span>
+                    <span title="Âm lượng">🔊</span>
+                    <span id="tray-clock">09:41</span>
+                    <button id="show-desktop" class="show-desktop" title="Hiện Desktop"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MISSION PANEL -->
+    <aside id="mission-panel" class="mission-panel">
+        <div class="mission-head">
+            <div class="mission-kicker">🎯 NHIỆM VỤ THỰC HÀNH</div>
+            <h1 id="mission-title">Đang tải...</h1>
+            <p id="mission-sub">Kịch bản giả lập Windows 10</p>
+        </div>
+        <div class="mission-progress-row">
+            <div class="mission-progress"><div id="mission-bar"></div></div>
+            <span id="mission-count">0/0</span>
+        </div>
+        <ol id="mission-steps" class="mission-steps"></ol>
+        <div id="mission-hint" class="mission-hint">Bấm 💡 Gợi ý nếu bé cần trợ giúp.</div>
+        <div class="mission-actions">
+            <button id="btn-hint" class="sim-btn">💡 Gợi ý</button>
+            <button id="btn-reset" class="sim-btn">↺ Làm lại</button>
+        </div>
+        <div class="mission-foot">
+            <span>🔊 Không cần micro — mọi thao tác đều bằng chuột và bàn phím.</span>
+        </div>
+    </aside>
+</div>
+
+<script src="sim-core.js"></script>
+<script src="sim-scenarios.js"></script>
+<script src="sim-apps.js"></script>
+</body>
+</html>

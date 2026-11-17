@@ -140,6 +140,36 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
 
+        /* RICH CONTENT BLOCKS (Bài 4+) */
+        .rich-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
+        .rich-card { background: #F8F9FA; border: 1px solid #E1DFDD; border-radius: 10px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.55; }
+        .rich-card .rc-icon { font-size: 1.3rem; margin-right: 4px; }
+        .rich-card strong { color: var(--primary-dark); }
+        .lesson-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.86rem; }
+        .lesson-table th { background: #EFF6FC; color: var(--primary-dark); text-align: left; padding: 8px 10px; border: 1px solid #D2D0CE; }
+        .lesson-table td { padding: 8px 10px; border: 1px solid #E1DFDD; vertical-align: top; line-height: 1.5; }
+        .lesson-table tr:nth-child(even) td { background: #FAF9F8; }
+        .table-scroll { overflow-x: auto; margin: 12px 0; }
+        .table-scroll .lesson-table { margin: 0; min-width: 520px; }
+        .keycap { display: inline-block; background: #323130; color: #fff; border-radius: 5px; padding: 1px 7px; font-family: Consolas, monospace; font-size: 0.82rem; box-shadow: 0 2px 0 #605E5C; margin: 0 2px; }
+        .flow-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch; margin: 12px 0; }
+        .flow-item { flex: 1; min-width: 130px; background: #EFF6FC; border: 1px solid #C7E0F4; border-radius: 8px; padding: 10px; font-size: 0.84rem; line-height: 1.45; }
+        .flow-item b { color: var(--primary-dark); }
+        .flow-arrow { display: flex; align-items: center; color: var(--primary); font-weight: 700; }
+        .warn-box { background: #FDE7E9; border-left: 4px solid #D13438; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 0.9rem; line-height: 1.55; }
+        .ok-box { background: #DFF6DD; border-left: 4px solid var(--success); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 0.9rem; line-height: 1.55; }
+        .vocab-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .vocab-chip { background: #F3F2F1; border: 1px solid #D2D0CE; border-radius: 20px; padding: 4px 12px; font-size: 0.82rem; }
+        .vocab-chip b { color: var(--primary-dark); }
+        .step-list { counter-reset: st; list-style: none; padding-left: 0; }
+        .step-list li { position: relative; padding-left: 38px; margin-bottom: 12px; font-size: 0.92rem; line-height: 1.6; }
+        .step-list li::before { counter-increment: st; content: counter(st); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+        .emoji-badge { font-size: 1.5rem; vertical-align: middle; }
+        .sim-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .sim-tab-btn { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 7px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #484644; }
+        .sim-tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .sim-tab-btn:hover { border-color: var(--primary); }
+
         /* TASKS */
         .task-card {
             background: #FFFFFF; border: 1px solid var(--border); border-radius: var(--radius);
@@ -370,6 +400,7 @@
 
             <!-- TAB 5: GIẢ LẬP (mỗi bài 1 kịch bản khác nhau) -->
             <section id="tab-sim" class="tab-content">
+                <div id="sim-tabs" class="sim-tabs"></div>
                 <div id="sim-container" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
                     <iframe id="sim-iframe" title="Giả lập minh họa bài học" style="width:100%;height:720px;border:none;background:#EAEAEA;"></iframe>
                 </div>
@@ -431,31 +462,84 @@
 
     <!-- NẠP TỆP DỮ LIỆU BÀI HỌC -->
     <script src="lessons_data.js"></script>
+    <script src="lessons_extra.js"></script>
 
     <script>
         let ALL_LESSONS = [];
         let currentLessonIndex = 0;
         let currentQuizAnswers = {};
 
-        /* ===== SIM REGISTRY: mỗi bài 1 kịch bản giả lập riêng ===== */
+        /* ===== SIM REGISTRY: mỗi bài có 1 hoặc nhiều kịch bản tương tác riêng ===== */
         const SIM_REGISTRY = {
-            3: { src: "sim-taskmanager.html", caption: "Kịch bản Bài 03: Quan sát nhịp tim CPU & RAM qua Task Manager (Ctrl + Shift + Esc → Performance)." }
+            3: { src: "sim-taskmanager.html", caption: "Kịch bản Bài 03: Quan sát nhịp tim CPU & RAM qua Task Manager (Ctrl + Shift + Esc → Performance)." },
+            4: [
+                { label: "🖥️ Giả lập Windows 10", src: "sim-win10.html?lesson=4", caption: "Bài 04: Luyện 5 thao tác chuột, mở Notepad bằng Start Menu và thao tác trên Desktop." },
+                { label: "🎮 Mini Game: Chuột & Phím", src: "minigame.html?game=mouse", caption: "Thử thách 6 vòng: nháy, nháy đúp, nháy phải, kéo thả, cuộn và gõ phím." }
+            ],
+            5: [
+                { label: "🖥️ Giả lập Windows 10", src: "sim-win10.html?lesson=5", caption: "Bài 05: Tìm Windows edition trong Settings > System > About, phân biệt HĐH – ứng dụng – website." },
+                { label: "🎮 Mini Game: Phân Loại", src: "minigame.html?game=classify", caption: "Phân loại 15 thứ vào 3 nhóm: Hệ điều hành, Ứng dụng, Website." }
+            ],
+            6: [
+                { label: "🖥️ Giả lập Windows 10", src: "sim-win10.html?lesson=6", caption: "Bài 06: Luyện Lock, đăng nhập, Sleep, Restart và Shut down đúng chuẩn Windows 10." },
+                { label: "🎮 Mini Game: Chế Độ Nguồn", src: "minigame.html?game=power", caption: "Chọn Sleep / Restart / Shut down / Lock cho 8 tình huống thực tế." }
+            ],
+            7: [
+                { label: "🖥️ Giả lập Windows 10", src: "sim-win10.html?lesson=7", caption: "Bài 07: Mở nhiều cửa sổ, thu nhỏ – phóng to – snap trái/phải – chuyển đổi – đóng." },
+                { label: "🎮 Mini Game: Điều Khiển Cửa Sổ", src: "minigame.html?game=window", caption: "Bấm đúng nút điều khiển cửa sổ và kéo cửa sổ vào nửa màn hình để snap." }
+            ],
+            8: [
+                { label: "🖥️ Giả lập Windows 10", src: "sim-win10.html?lesson=8", caption: "Bài 08: File Explorer — hiện đuôi tệp, tạo thư mục, đổi tên, xem Properties, xóa và khôi phục." },
+                { label: "🎮 Mini Game: Định Dạng Tệp", src: "minigame.html?game=files", caption: "Đưa 10 tệp vào đúng nhóm: Văn bản, Ảnh, Âm thanh/Video, Chương trình." }
+            ],
+            9: [
+                { label: "🖥️ Giả lập Windows 10", src: "sim-win10.html?lesson=9", caption: "Bài 09: Mở Edge, so sánh trang học tập an toàn với trang lừa đảo và ghi quy tắc an toàn." },
+                { label: "🎮 Mini Game: Tình Huống An Toàn", src: "minigame.html?game=safety", caption: "Xử lý 10 tình huống: Nên làm – Không nên – Hỏi người lớn." }
+            ],
+            10: [
+                { label: "🖥️ Giả lập Windows 10", src: "sim-win10.html?lesson=10", caption: "Bài 10: Đọc Device name, CPU, RAM trong About; xem Performance, Storage và ổ đĩa." },
+                { label: "🎮 Mini Game: Bản Đồ Máy Tính", src: "minigame.html?game=map", caption: "Xếp 12 thành phần vào 4 lớp: Phần cứng, Hệ điều hành, Ứng dụng, Dữ liệu." }
+            ]
         };
+        let currentSimTabs = [];
         function loadSim(lessonId) {
             const frame = document.getElementById("sim-iframe");
             const cap = document.getElementById("sim-caption");
+            const tabWrap = document.getElementById("sim-tabs");
             if (!frame) return;
-            const entry = SIM_REGISTRY[lessonId];
-            if (entry) {
-                // QUAN TRỌNG: srcdoc lấn át src — phải gỡ hẳn mới hiện được sim-taskmanager.html
-                frame.removeAttribute("srcdoc");
-                frame.setAttribute("src", entry.src);
-                if (cap) cap.innerText = "🔬 " + entry.caption;
+            let entry = SIM_REGISTRY[lessonId];
+            if (entry && !Array.isArray(entry)) entry = [entry];
+            currentSimTabs = entry || [];
+            if (tabWrap) {
+                tabWrap.innerHTML = "";
+                currentSimTabs.forEach((item, idx) => {
+                    const b = document.createElement("button");
+                    b.className = "sim-tab-btn" + (idx === 0 ? " active" : "");
+                    b.innerText = item.label || ("Kịch bản " + (idx + 1));
+                    b.onclick = function() { selectSimTab(idx); };
+                    tabWrap.appendChild(b);
+                });
+                tabWrap.style.display = currentSimTabs.length ? "flex" : "none";
+            }
+            if (currentSimTabs.length) {
+                selectSimTab(0);
             } else {
                 try { frame.removeAttribute("src"); } catch(e){}
-                frame.srcdoc = "<div style=\"font-family:'Segoe UI',sans-serif;padding:40px;text-align:center;color:#605E5C\"><div style=\"font-size:3rem\">🔬</div><h3>Kịch bản giả lập cho bài này đang được xây dựng</h3><p>Mỗi bài sẽ có 1 kịch bản minh họa khác nhau.<br>Hiện đã có: <b>Bài 03 — Task Manager (CPU/RAM/SSD)</b>.</p></div>";
-                if (cap) cap.innerText = "🔬 Bài này chưa có kịch bản giả lập riêng — hãy xem Bài 03 để thử mẫu Task Manager.";
+                frame.srcdoc = "<div style=\"font-family:'Segoe UI',sans-serif;padding:40px;text-align:center;color:#605E5C\"><div style=\"font-size:3rem\">🔬</div><h3>Kịch bản giả lập cho bài này đang được xây dựng</h3><p>Mỗi bài sẽ có kịch bản minh họa riêng.<br>Hiện đã có: <b>Bài 03 — Task Manager</b> và <b>Bài 04–08 — Windows 10 + Mini Game</b>.</p></div>";
+                if (cap) cap.innerText = "🔬 Bài này chưa có kịch bản giả lập riêng — hãy xem Bài 04–08 để trải nghiệm bộ giả lập Windows 10.";
             }
+        }
+        function selectSimTab(idx) {
+            const entry = currentSimTabs[idx];
+            if (!entry) return;
+            const frame = document.getElementById("sim-iframe");
+            const cap = document.getElementById("sim-caption");
+            frame.removeAttribute("srcdoc");
+            frame.setAttribute("src", entry.src);
+            if (cap) cap.innerText = "🔬 " + (entry.caption || "");
+            document.querySelectorAll("#sim-tabs .sim-tab-btn").forEach(function(b, i) {
+                b.classList.toggle("active", i === idx);
+            });
         }
 
         const ADMIN_PASSWORD = "0786001768";

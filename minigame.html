@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Game — Học vi tính</title>
+<link rel="stylesheet" href="minigame.css">
+</head>
+<body>
+<div id="shell">
+    <header class="mg-head">
+        <div id="game-icon" class="mg-icon">🎮</div>
+        <div class="mg-head-text">
+            <h1 id="game-title">Mini Game</h1>
+            <p id="game-sub">Đang tải trò chơi...</p>
+        </div>
+        <div id="game-score" class="mg-score">0 điểm</div>
+    </header>
+    <div class="mg-progress"><div id="mg-bar"></div></div>
+    <main id="stage" class="mg-stage"></main>
+    <footer class="mg-foot">
+        <div id="feedback" class="mg-feedback" role="status" aria-live="polite">Chọn đáp án hoặc thao tác để bắt đầu.</div>
+        <button id="reset-btn" class="mg-btn">↺ Chơi lại</button>
+    </footer>
+</div>
+<div id="finish" class="finish hidden">
+    <div class="finish-card">
+        <div id="finish-stars" class="finish-stars">⭐⭐⭐</div>
+        <h2 id="finish-title">Hoàn thành!</h2>
+        <p id="finish-text"></p>
+        <div id="finish-score" class="finish-score">0 điểm</div>
+        <button id="finish-again" class="mg-btn primary">↺ Chơi lại</button>
+    </div>
+</div>
+<script src="minigame.js"></script>
+</body>
+</html>
