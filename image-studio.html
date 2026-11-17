@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xưởng Ảnh Bài Học — Học Vi Tính</title>
+<link rel="stylesheet" href="image-studio.css">
+</head>
+<body>
+<header class="studio-head">
+    <div class="brand">
+        <span class="brand-ico">🖼️</span>
+        <div>
+            <h1>Xưởng Ảnh Bài Học</h1>
+            <p>Chèn ảnh minh hoạ vào đúng bài và buổi — không cần sửa code</p>
+        </div>
+    </div>
+    <a class="btn ghost" href="index.html">← Về trang học</a>
+</header>
+
+<main class="studio-main">
+    <section class="panel form-panel">
+        <h2><span class="step-no">1</span> Chọn vị trí</h2>
+
+        <label class="field">
+            <span>Bài học</span>
+            <select id="lesson-select" aria-label="Chọn bài học"></select>
+        </label>
+
+        <div class="field">
+            <span>Buổi học</span>
+            <div class="session-btns" id="session-btns">
+                <button type="button" data-session="1" class="active">Buổi 1</button>
+                <button type="button" data-session="2">Buổi 2</button>
+                <button type="button" data-session="3">Buổi 3</button>
+            </div>
+        </div>
+
+        <h2><span class="step-no">2</span> Thông tin ảnh</h2>
+
+        <label class="field">
+            <span>Đường dẫn ảnh</span>
+            <input id="src-input" type="text" placeholder="https://... hoặc images/bai04.png" autocomplete="off">
+            <small>Dán URL ảnh, hoặc đường dẫn tới file trong thư mục <code>images/</code>.</small>
+        </label>
+
+        <label class="field">
+            <span>Mô tả ảnh (alt)</span>
+            <input id="alt-input" type="text" placeholder="Ví dụ: Bàn phím, chuột và màn hình máy tính" autocomplete="off">
+            <small>Giúp người khiếm thị hiểu nội dung; nên viết ngắn gọn.</small>
+        </label>
+
+        <label class="field">
+            <span>Chú thích dưới ảnh (tuỳ chọn)</span>
+            <input id="caption-input" type="text" placeholder="Ví dụ: Hình 1 — Ba người bạn của bé" autocomplete="off">
+        </label>
+
+        <label class="field">
+            <span>Vị trí chèn</span>
+            <select id="pos-select">
+                <option value="mid">Sau tiêu đề đầu tiên (khuyến nghị)</option>
+                <option value="top">Đầu buổi học</option>
+                <option value="end">Cuối buổi học</option>
+            </select>
+        </label>
+
+        <button type="button" id="add-btn" class="btn primary block">➕ Thêm ảnh vào bài</button>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+
+        <div class="preview-box">
+            <div class="preview-head"><span>Xem trước ảnh</span><span id="preview-pos" class="pill">Sau tiêu đề</span></div>
+            <div id="preview-body" class="preview-body">
+                <div class="preview-empty">Chưa có ảnh — dán đường dẫn để xem trước.</div>
+            </div>
+        </div>
+
+        <button type="button" id="open-lesson" class="btn ghost block">👁️ Xem trên trang học</button>
+        <small class="note">Nút này mở trang học ở chế độ xem trước, dùng dữ liệu ảnh đang lưu tạm trên máy.</small>
+    </section>
+
+    <section class="panel list-panel">
+        <div class="list-head">
+            <div>
+                <h2>Ảnh của buổi đang chọn</h2>
+                <p id="list-sub" class="list-sub"></p>
+            </div>
+            <span id="count-badge" class="count-badge">0 ảnh</span>
+        </div>
+
+        <div id="image-list" class="image-list"></div>
+
+        <div class="publish">
+            <h3>Phát hành cho mọi người</h3>
+            <p>Tải file về, thay thế <code>lesson_images.js</code> trong thư mục dự án rồi commit + push. GitHub Pages sẽ tự cập nhật.</p>
+            <div class="publish-actions">
+                <button type="button" id="download-btn" class="btn primary">⬇️ Tải lesson_images.js</button>
+                <button type="button" id="overwrite-btn" class="btn">💾 Ghi đè file</button>
+            </div>
+            <small class="note">“Ghi đè file” chỉ hoạt động trên Chrome/Edge và sẽ hỏi bạn chọn file đích.</small>
+        </div>
+
+        <div class="danger-row">
+            <button type="button" id="clear-session" class="btn danger">🗑️ Xoá ảnh buổi này</button>
+            <button type="button" id="reset-local" class="btn subtle">↺ Bỏ dữ liệu tạm</button>
+        </div>
+
+        <details class="help">
+            <summary>💡 Cách hoạt động &amp; mẹo</summary>
+            <ul>
+                <li>Ảnh được lưu thành danh sách theo <b>bài → buổi</b>, không sửa nội dung lý thuyết gốc.</li>
+                <li>“Dữ liệu tạm” chỉ thấy trên trình duyệt này; muốn mọi người thấy phải tải file và thay vào dự án.</li>
+                <li>Ảnh nên nén dưới ~300 KB, dùng PNG/JPG/WebP. Tên file không dấu, không khoảng trắng.</li>
+                <li>Vị trí “Sau tiêu đề đầu tiên” chèn ngay dưới thẻ <code>&lt;h4&gt;</code> đầu tiên của buổi.</li>
+                <li>Nếu ảnh không hiện: kiểm tra URL mở được trực tiếp trong tab mới.</li>
+            </ul>
+        </details>
+    </section>
+</main>
+
+<script src="lessons_data.js"></script>
+<script src="lessons_extra.js"></script>
+<script src="lesson_images.js"></script>
+<script src="image-studio.js"></script>
+</body>
+</html>

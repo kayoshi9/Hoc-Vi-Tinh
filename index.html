@@ -140,6 +140,13 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
 
+        .lesson-figure { margin: 16px 0; }
+        .lesson-figure img.lesson-image { margin: 0; }
+        .lesson-figure figcaption {
+            margin-top: 6px; text-align: center; font-size: 0.8rem;
+            color: var(--text-muted); font-style: italic;
+        }
+
         /* RICH CONTENT BLOCKS (Bài 4+) */
         .rich-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 12px 0; }
         .rich-card { background: #F8F9FA; border: 1px solid #E1DFDD; border-radius: 10px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.55; }
@@ -311,6 +318,7 @@
             <div class="badge-shelf">
                 <span class="badge-pill clickable" id="badges-pill-btn" onclick="openBadgesModal()" title="Bấm để xem bộ sưu tập huy hiệu">🏅 Huy hiệu: <strong id="badges-count">0</strong>/63</span>
                 <span class="badge-pill">✅ Đã xong: <strong id="done-count">0</strong> bài</span>
+                <a class="btn" id="image-studio-link" href="image-studio.html" target="_blank" style="display:none;padding:6px 14px;font-size:0.8rem;background:#0f766e;color:#fff;text-decoration:none;">🖼️ Ảnh</a>
                 <button class="btn" id="admin-btn" style="padding:6px 14px; font-size:0.8rem; background:#605E5C;" onclick="toggleAdminMode()">🔐 Admin</button>
             </div>
         </header>
@@ -463,11 +471,15 @@
     <!-- NẠP TỆP DỮ LIỆU BÀI HỌC -->
     <script src="lessons_data.js"></script>
     <script src="lessons_extra.js"></script>
+    <script src="lesson_images.js"></script>
 
     <script>
         let ALL_LESSONS = [];
         let currentLessonIndex = 0;
         let currentQuizAnswers = {};
+        const PAGE_PARAMS = new URLSearchParams(location.search);
+        const PREVIEW_LESSON_ID = parseInt(PAGE_PARAMS.get("lesson"), 10);
+        const PREVIEW_MODE = PAGE_PARAMS.get("preview") === "1";
 
         /* ===== SIM REGISTRY: mỗi bài có 1 hoặc nhiều kịch bản tương tác riêng ===== */
         const SIM_REGISTRY = {
@@ -666,10 +678,78 @@
         function isLessonUnlocked(index) {
             if (index <= 0) return true;
             if (isAdminMode) return true;
+            if (PREVIEW_MODE) return true;
             const prevLesson = ALL_LESSONS[index - 1];
             if (!prevLesson) return true;
             const prevScore = userState.quizScores[prevLesson.id] || 0;
             return prevScore >= QUIZ_PASS_SCORE;
+        }
+
+        function getLessonImageConfig() {
+            let cfg = window.LESSON_IMAGES || {};
+            try {
+                const saved = localStorage.getItem("coder_nhi_lesson_images");
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && typeof parsed === "object") cfg = parsed;
+                }
+            } catch (e) { /* bỏ qua nếu localStorage bị chặn */ }
+            return cfg || {};
+        }
+
+        function applyLessonImages(lessonId) {
+            const cfg = getLessonImageConfig();
+            const bySession = cfg[String(lessonId)] || cfg[lessonId] || {};
+            for (let s = 1; s <= 3; s++) {
+                const body = document.getElementById("session" + s + "-body");
+                if (!body) continue;
+                const list = bySession[String(s)] || bySession[s];
+                if (!Array.isArray(list) || !list.length) continue;
+
+                function makeFigure(meta) {
+                    if (!meta || typeof meta.src !== "string" || !meta.src) return null;
+                    const fig = document.createElement("figure");
+                    fig.className = "lesson-figure";
+                    const img = document.createElement("img");
+                    img.src = meta.src;
+                    img.alt = meta.alt || "Minh hoạ bài học";
+                    img.className = "lesson-image";
+                    img.loading = "lazy";
+                    fig.appendChild(img);
+                    if (meta.caption) {
+                        const cap = document.createElement("figcaption");
+                        cap.textContent = meta.caption;
+                        fig.appendChild(cap);
+                    }
+                    return fig;
+                }
+
+                const top = [], mid = [], end = [];
+                list.forEach(function (m) {
+                    if (m && m.pos === "top") top.push(m);
+                    else if (m && m.pos === "end") end.push(m);
+                    else mid.push(m);
+                });
+                top.slice().reverse().forEach(function (m) {
+                    const f = makeFigure(m);
+                    if (f) body.prepend(f);
+                });
+                let anchor = body.querySelector("h4, h3, h2");
+                mid.forEach(function (m) {
+                    const f = makeFigure(m);
+                    if (!f) return;
+                    if (anchor) {
+                        anchor.insertAdjacentElement("afterend", f);
+                        anchor = f;
+                    } else {
+                        body.appendChild(f);
+                    }
+                });
+                end.forEach(function (m) {
+                    const f = makeFigure(m);
+                    if (f) body.appendChild(f);
+                });
+            }
         }
 
         function loadLesson(index) {
@@ -698,6 +778,7 @@
             document.getElementById("session1-body").innerHTML = lesson.session1;
             document.getElementById("session2-body").innerHTML = lesson.session2;
             document.getElementById("session3-body").innerHTML = lesson.session3;
+            applyLessonImages(lesson.id);
 
             // Tasks
             const tasksContainer = document.getElementById("tasks-container");
@@ -948,6 +1029,8 @@
                 isAdminMode = false;
                 adminBtn.innerText = "🔐 Admin";
                 adminBtn.style.background = "#605E5C";
+                const studioLink = document.getElementById("image-studio-link");
+                if (studioLink) studioLink.style.display = "none";
                 showToast("🔒", "ĐÃ THOÁT CHẾ ĐỘ ADMIN", "Các bài học đã được khóa trở lại theo tiến độ của bé.");
                 renderSidebar();
                 if (!isLessonUnlocked(currentLessonIndex)) {
@@ -967,6 +1050,8 @@
                 isAdminMode = true;
                 adminBtn.innerText = "🔓 Admin: ON";
                 adminBtn.style.background = "var(--success)";
+                const studioLink = document.getElementById("image-studio-link");
+                if (studioLink) studioLink.style.display = "inline-flex";
                 showToast("🔓", "ĐÃ BẬT CHẾ ĐỘ ADMIN", "Toàn bộ bài học đã được mở khóa!");
                 renderSidebar();
             } else {
@@ -1029,6 +1114,10 @@
             }
             updateOverallStats();
             loadLesson(0);
+            if (PREVIEW_LESSON_ID) {
+                const previewIndex = ALL_LESSONS.findIndex(l => l.id === PREVIEW_LESSON_ID);
+                if (previewIndex >= 0) loadLesson(previewIndex);
+            }
 
             // Đóng modal khi bấm ra ngoài + phím Esc
             ["badges-modal", "celebrate-modal"].forEach(modalId => {
